@@ -1,0 +1,10 @@
+tinyint
+smallint
+int
+bigint
+float
+double
+string
+date
+timestamp
+boolean
