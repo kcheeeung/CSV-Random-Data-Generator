@@ -30,6 +30,7 @@ public class DataGen {
     private final LocalDate to = LocalDate.of(2020, 1, 1);
 
     private int numRecords;
+    private boolean cleanDLL = false;
     private ArrayList<DDLType> ddl;
     private Random random = new Random();
     private ArrayList<String> buffer;
@@ -52,6 +53,12 @@ public class DataGen {
         ddl = new ArrayList<>();
     }
 
+    public DataGen(int records, boolean clnDDL) {
+        numRecords = records;
+        cleanDLL = clnDDL;
+        ddl = new ArrayList<>();
+    }
+
     public void runProgram() {
         long startTime = clock();
         DDL_LOCATION = "./DDL.txt";
@@ -63,8 +70,13 @@ public class DataGen {
 
     public void runSample() {
         long startTime = clock();
-        DDL_LOCATION = "./sample/sampleDDL.txt";
-        CSV_LOCATION = "./sample/sampledata.csv";
+        if (!cleanDLL) {
+            DDL_LOCATION = "./sample/sampleDDL.txt";
+            CSV_LOCATION = "./sample/sampledata.csv";
+        } else {
+            DDL_LOCATION = "./sample/sampleDDLClean.txt";
+            CSV_LOCATION = "./sample/sampledataClean.csv";
+        }
         readFile();
         createCSV();
         printElapsedTime(startTime);
@@ -78,8 +90,14 @@ public class DataGen {
             String line;
             while ((line = file.readLine()) != null) {
                 line = line.toLowerCase();
-                // line = line.replaceAll(",", "");
-                // line = line.split(" ")[1];
+                
+                // Optional advanced mode to clean DDL
+                if (cleanDLL) {
+                    line = line.trim();
+                    line = line.replaceAll(",", "");
+                    line = line.split(" ")[1];
+                }
+
                 switch (line) {
                     case "tinyint":
                         ddl.add(DDLType.tinyint); break;
@@ -194,16 +212,35 @@ public class DataGen {
         System.out.println((clock() - startTime) / 1000.0f + " secs");
     }
 
-    public static void main(String[] args) throws Exception {
-        // // Sample Run
-        // DataGen testGen = new DataGen(10);
-        // testGen.runSample();
+    public static void runTests() {
+        DataGen testGen = new DataGen(10);
+        testGen.runSample();
+        DataGen testGenClean = new DataGen(10, true);
+        testGenClean.runSample();
+    }
 
-        if (args.length == 1) {
-            DataGen gen = new DataGen(Integer.parseInt(args[0]));
-            gen.runProgram();
-        } else {
-            throw new Exception("Pass in the number of desired records.");
+    public static void main(String[] args) throws Exception {
+        DataGen gen;
+        switch (args.length) {
+            case 1:
+                if (!"test".equals(args[0])) {
+                    gen = new DataGen(Integer.parseInt(args[0]));
+                    gen.runProgram();
+                } else {
+                    System.out.println("Running Sample DDLs");
+                    runTests();
+                }
+                break;
+            case 2:
+                if ("clean".equals(args[1])) {
+                    gen = new DataGen(Integer.parseInt(args[0]), true);
+                    gen.runProgram();
+                } else {
+                    throw new Exception("'" + args[1] + "' is an invalid argument!");
+                }
+                break;
+            default:
+                throw new Exception("Invalid number of arguments!");
         }
     }
 }

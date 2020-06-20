@@ -19,6 +19,21 @@ Insert your DDL. Pass in the number of desired records.
 java DataGen 10
 ```
 
+## 4. Run in Advanced Mode (Optional)
+The `show create table MYTABLE` is formatted like below and needs clean up.
+```
+CREATE TABLE `mytable` (
+    `firstname` string,
+    `lastname` string,
+    `age` int,
+    `height` float
+)
+```
+The argument `clean` does a basic cleanup, allowing you to just paste the columns of the DDL.
+```
+java DataGen 10 clean
+```
+
 # Supported Types
 - tinyint
 - smallint

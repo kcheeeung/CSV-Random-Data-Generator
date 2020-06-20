@@ -1,0 +1,10 @@
+    `id` tinyint,
+    `uniqueid` smallint,
+    `purchases` int,
+    `UUID` bigint,
+    `itemprice` float,
+    `totalrevenue` double,
+    `itemname` string,
+    `datepurchased` date,
+    `timepurchased` timestamp,
+    `didbuy` boolean
